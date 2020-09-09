@@ -212,6 +212,7 @@ PODS:
     - abseil/base/base_internal
     - abseil/base/config
     - abseil/meta/type_traits
+  - BFTransmitter (0.1.33)
   - boost-for-react-native (1.63.0)
   - BoringSSL-GRPC (0.0.7):
     - BoringSSL-GRPC/Implementation (= 0.0.7)
@@ -219,6 +220,9 @@ PODS:
   - BoringSSL-GRPC/Implementation (0.0.7):
     - BoringSSL-GRPC/Interface (= 0.0.7)
   - BoringSSL-GRPC/Interface (0.0.7)
+  - BridgefySdk (1.0.0):
+    - BFTransmitter
+    - React
   - BVLinearGradient (2.5.6):
     - React
   - CocoaAsyncSocket (7.6.4)
@@ -717,7 +721,7 @@ PODS:
     - Firebase/Storage (~> 6.25.0)
     - React
     - RNFBApp
-  - RNGestureHandler (1.6.1):
+  - RNGestureHandler (1.8.0):
     - React
   - RNImageCropPicker (0.32.0):
     - React-Core
@@ -728,7 +732,7 @@ PODS:
     - React-Core
     - React-RCTImage
     - TOCropViewController
-  - RNReanimated (1.9.0):
+  - RNReanimated (1.13.0):
     - React
   - RNScreens (2.8.0):
     - React
@@ -742,6 +746,7 @@ PODS:
     - Yoga (~> 1.14)
 
 DEPENDENCIES:
+  - BridgefySdk (from `../node_modules/react-native-bridgefy-sdk/ios`)
   - BVLinearGradient (from `../node_modules/react-native-linear-gradient`)
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
@@ -815,6 +820,7 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - abseil
+    - BFTransmitter
     - boost-for-react-native
     - BoringSSL-GRPC
     - CocoaAsyncSocket
@@ -857,6 +863,8 @@ SPEC REPOS:
     - YogaKit
 
 EXTERNAL SOURCES:
+  BridgefySdk:
+    :path: "../node_modules/react-native-bridgefy-sdk/ios"
   BVLinearGradient:
     :path: "../node_modules/react-native-linear-gradient"
   DoubleConversion:
@@ -954,8 +962,10 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   abseil: 6c8eb7892aefa08d929b39f9bb108e5367e3228f
+  BFTransmitter: 45c27a15fa9a97f650e02440726a5444faea35b4
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
   BoringSSL-GRPC: 8edf627ee524575e2f8d19d56f068b448eea3879
+  BridgefySdk: 690676d8651d30ad41e8ab68906d4712225ca0a4
   BVLinearGradient: e3aad03778a456d77928f594a649e96995f1c872
   CocoaAsyncSocket: 694058e7c0ed05a9e217d1b3c7ded962f4180845
   CocoaLibEvent: 2fab71b8bd46dd33ddb959f7928ec5909f838e3f
@@ -1032,9 +1042,9 @@ SPEC CHECKSUMS:
   RNFBFunctions: b50d56e14528e98190e352acb720f406cb05bf4a
   RNFBMessaging: aa49ccb32399c14b1c6ca1bf8133c6571f8097ab
   RNFBStorage: f4a2e5496e0bb98417d921b593e923e78a70f6e1
-  RNGestureHandler: 8f09cd560f8d533eb36da5a6c5a843af9f056b38
+  RNGestureHandler: 7a5833d0f788dbd107fbb913e09aa0c1ff333c39
   RNImageCropPicker: fc4b4d2a4d7176eeb6442fa191ba56493c14b6d6
-  RNReanimated: b5ccb50650ba06f6e749c7c329a1bc3ae0c88b43
+  RNReanimated: 89f5e0a04d1dd52fbf27e7e7030d8f80a646a3fc
   RNScreens: 62211832af51e0aebcf6e8c36bcf7dd65592f244
   RNSVG: ce9d996113475209013317e48b05c21ee988d42e
   RNVectorIcons: 0bb4def82230be1333ddaeee9fcba45f0b288ed4

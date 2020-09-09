@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {View, TouchableOpacity, Alert, Platform, Linking} from 'react-native';
 import {Header} from 'react-native-elements';
+import Bridgefy from 'react-native-bridgefy-sdk';
 import {Icon, theme} from 'galio-framework';
 import MapView from 'react-native-maps';
 import {
@@ -43,6 +44,9 @@ class Conversation extends Component {
         messages: GiftedChat.append(previous.messages, message),
       }));
     });
+
+    // TODO Why BridgeFy SDK is null ?
+    console.log('BridgeFy SDK: ', Bridgefy);
   }
 
   componentWillUnmount() {

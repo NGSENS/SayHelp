@@ -28,7 +28,7 @@ const createTargetedEmergency = (
   createdAt,
   type,
   field,
-  descritpion,
+  description,
 ) => {
   const key = `${victim}-${createdAt}`;
   firestore()
@@ -41,7 +41,7 @@ const createTargetedEmergency = (
       loading: true,
       type: type,
       field: field,
-      descritpion: descritpion,
+      description: description,
     })
     .then(() => {
       console.log('Emergency created successfully');
@@ -133,6 +133,25 @@ const getCaregiver = async emergencyKey => {
   return emergency._data.caregiver;
 };
 
+const getTargetedAlertData = async emergencyKey => {
+  const emergency = await firestore()
+    .collection('Emergencies')
+    .doc(emergencyKey)
+    .get();
+  return {
+    fieldKey: emergency._data.field,
+    description: emergency._data.description,
+  };
+};
+
+const getCaresFieldTitle = async caresFieldKey => {
+  const caresField = await firestore()
+    .collection('Fields')
+    .doc(caresFieldKey)
+    .get();
+  return caresField._data.title;
+};
+
 export {
   createEmergency,
   createTargetedEmergency,
@@ -141,4 +160,6 @@ export {
   getConversationKey,
   getVictim,
   getCaregiver,
+  getTargetedAlertData,
+  getCaresFieldTitle,
 };

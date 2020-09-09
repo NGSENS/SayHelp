@@ -6,7 +6,7 @@ import Geolocation from '@react-native-community/geolocation';
 import {Colors} from '../styles';
 import * as RootNavigation from './navigation';
 import * as screenNames from '../navigation/screen_names';
-import {getUser, getUserEmail} from './user';
+import {getUser, getUserCaresFields, getUserEmail} from './user';
 import {
   createEmergency,
   createTargetedEmergency,
@@ -64,30 +64,76 @@ const addForegroundHandler = () => {
           getUser(remoteMessage.data.sender).then(user => {
             const victim = user.firstname ? user.firstname : user.email;
 
-            // Render a react component to show a kind of notification
-            showMessage({
-              message: 'New quick emergency',
-              description: `${victim} is in a bad situation and you are close to him. Please contact him for help.`,
-              type: 'danger',
-              autoHide: false,
-              icon: 'warning',
-              style: {
-                paddingTop: 30,
-                borderBottomWidth: 4,
-                borderColor: Colors.WHITE,
-              },
-              onPress: () => {
-                console.log('TOFIX : I press on the internal notification');
-                // TODO MAKE THESE STEPS IN CHAT SCREEN
-                // TODO IT SHOULD BE PROMISE AND ONLY NAVIGATE WHEN FINISH
-                setCaregiver(remoteMessage.data.emergency);
-                setConversationKey(remoteMessage.data.emergency);
-                RootNavigation.navigate(screenNames.CHAT, {
-                  quickPanel: true,
-                  emergency: remoteMessage.data.emergency,
+            if (remoteMessage.data.field) {
+              // Check if the caregiver is subscribed to this field.
+              getUserCaresFields()
+                .then(caresFields => {
+                  // If the caregiver is not subscribed to this cares field, we don't show him any message
+                  if (!caresFields.includes(remoteMessage.data.field)) {
+                    return;
+                  }
+
+                  // Render a react component to show a kind of notification
+                  showMessage({
+                    message: 'New targeted emergency',
+                    description: `${victim} triggered a targeted alert and you are close to him. Please contact him for help.`,
+                    type: 'warning',
+                    autoHide: false,
+                    icon: 'warning',
+                    style: {
+                      paddingTop: 30,
+                      borderBottomWidth: 4,
+                      borderColor: Colors.WHITE,
+                    },
+                    onPress: () => {
+                      console.log(
+                        'TOFIX : I press on the internal notification',
+                      );
+                      // TODO MAKE THESE STEPS IN CHAT SCREEN
+                      // TODO IT SHOULD BE PROMISE AND ONLY NAVIGATE WHEN FINISH
+                      setCaregiver(remoteMessage.data.emergency);
+                      setConversationKey(remoteMessage.data.emergency);
+                      RootNavigation.navigate(screenNames.CHAT, {
+                        quickPanel: false,
+                        targetedPanel: true,
+                        emergency: remoteMessage.data.emergency,
+                      });
+                    },
+                  });
+                })
+                .catch(error => {
+                  console.log(
+                    'Error getting the user cares fields. Error: ',
+                    error,
+                  );
                 });
-              },
-            });
+            } else {
+              // Render a react component to show a kind of notification
+              showMessage({
+                message: 'New quick emergency',
+                description: `${victim} is in a bad situation and you are close to him. Please contact him for help.`,
+                type: 'danger',
+                autoHide: false,
+                icon: 'warning',
+                style: {
+                  paddingTop: 30,
+                  borderBottomWidth: 4,
+                  borderColor: Colors.WHITE,
+                },
+                onPress: () => {
+                  console.log('TOFIX : I press on the internal notification');
+                  // TODO MAKE THESE STEPS IN CHAT SCREEN
+                  // TODO IT SHOULD BE PROMISE AND ONLY NAVIGATE WHEN FINISH
+                  setCaregiver(remoteMessage.data.emergency);
+                  setConversationKey(remoteMessage.data.emergency);
+                  RootNavigation.navigate(screenNames.CHAT, {
+                    quickPanel: true,
+                    targetedPanel: false,
+                    emergency: remoteMessage.data.emergency,
+                  });
+                },
+              });
+            }
           });
         } else {
           console.log('The caregiver is too far away from the victim.');
@@ -112,10 +158,6 @@ const addBackgroundHandler = () => {
       .then(theUserIsClose => {
         if (theUserIsClose) {
           sendLocalNotification(remoteMessage);
-          RootNavigation.navigate(screenNames.CHAT, {
-            quickPanel: true,
-            emergency: remoteMessage.data.emergency,
-          });
         } else {
           console.log('The caregiver is too far away from the victim.');
         }
@@ -136,10 +178,37 @@ const sendLocalNotification = remoteMessage => {
     getUser(data.sender).then(user => {
       const victim = user.firstname ? user.firstname : user.email;
 
-      PushNotification.localNotification({
-        title: 'New quick emergency 🆘',
-        message: `${victim} is in a bad situation and you are close to him. Please contact him for help.`,
-      });
+      if (data.field) {
+        // Check if the caregiver is subscribed to this field.
+        getUserCaresFields().then(caresField => {
+          // If the caregiver is not subscribed to this cares field, we don't show him any message
+          if (!caresField.includes(data.field)) {
+            return;
+          }
+
+          PushNotification.localNotification({
+            title: 'New targeted emergency ⚠️',
+            message: `${victim} triggered a targeted alert and you are close to him. Please contact him for help.`,
+          });
+
+          RootNavigation.navigate(screenNames.CHAT, {
+            quickPanel: false,
+            targetedPanel: true,
+            emergency: remoteMessage.data.emergency,
+          });
+        });
+      } else {
+        PushNotification.localNotification({
+          title: 'New quick emergency 🆘',
+          message: `${victim} is in a bad situation and you are close to him. Please contact him for help.`,
+        });
+
+        RootNavigation.navigate(screenNames.CHAT, {
+          quickPanel: true,
+          targetedPanel: false,
+          emergency: remoteMessage.data.emergency,
+        });
+      }
     });
   } else {
     PushNotification.localNotification({

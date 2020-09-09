@@ -62,7 +62,7 @@ export default StyleSheet.create({
     fontSize: Typography.FONT_SIZE_20,
   },
   warningButton: {
-    backgroundColor: '#FFC107',
+    backgroundColor: '#F0AD4F',
   },
   warningButtonText: {
     color: Colors.WHITE,

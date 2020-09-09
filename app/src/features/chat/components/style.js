@@ -28,6 +28,7 @@ export default StyleSheet.create({
     marginTop: 20,
     marginRight: 20,
     marginLeft: 20,
+    marginBottom: 20,
   },
   panelTitle: {
     fontWeight: 'bold',

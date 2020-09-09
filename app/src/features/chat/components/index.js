@@ -13,7 +13,11 @@ import {Linking} from 'react-native';
 import styles from './style';
 import * as screenNames from '../../../navigation/screen_names';
 import {getVictimPhoneNumber} from '../../../utils/user';
-import {getVictim} from '../../../utils/emergency';
+import {
+  getCaresFieldTitle,
+  getTargetedAlertData,
+  getVictim,
+} from '../../../utils/emergency';
 import {getChatRooms} from '../../../utils/message';
 import {Colors} from '../../../styles';
 import default_user from '../../../assets/images/default_user.png';
@@ -24,6 +28,9 @@ const Chat = ({route, navigation}) => {
   const isQuickPanelActiveProps = route.params
     ? route.params.quickPanel
     : false;
+  const isTargetedPanelActiveProps = route.params
+    ? route.params.targetedPanel
+    : false;
 
   // Create state properties
   const [loading, setLoading] = useState(true);
@@ -32,15 +39,25 @@ const Chat = ({route, navigation}) => {
   const [isQuickPanelActive, setIsQuickPanelActive] = useState(
     isQuickPanelActiveProps,
   );
+  const [isTargetedPanelActive, setIsTargetedPanelActive] = useState(
+    isTargetedPanelActiveProps,
+  );
+  const [targetedDescription, setTargetedDescription] = useState('');
+  const [targetedField, setTargetedField] = useState('');
 
   const closePanel = () => {
     setIsQuickPanelActive(false);
+    setIsTargetedPanelActive(false);
     route.params.quickPanel = false;
+    route.params.targetedPanel = false;
   };
 
   const addNavigationListener = useCallback(() => {
     return navigation.addListener('focus', () => {
       setIsQuickPanelActive(route.params ? route.params.quickPanel : false);
+      setIsTargetedPanelActive(
+        route.params ? route.params.targetedPanel : false,
+      );
     });
   });
 
@@ -84,6 +101,29 @@ const Chat = ({route, navigation}) => {
   const getImage = image => {
     return image ? {uri: image} : default_user;
   };
+
+  useEffect(() => {
+    getTargetedAlertData(emergency)
+      .then(data => {
+        const {description, fieldKey} = data;
+        if (fieldKey) {
+          setTargetedDescription(description);
+          getCaresFieldTitle(fieldKey)
+            .then(caresFieldTitle => {
+              setTargetedField(caresFieldTitle);
+            })
+            .catch(error =>
+              console.log(
+                'Error getting the cares field title. Error: ',
+                error,
+              ),
+            );
+        }
+      })
+      .catch(error =>
+        console.log('Error getting targeted alert info. Error: ', error),
+      );
+  }, [emergency]);
 
   let content;
   if (loading) {
@@ -167,6 +207,42 @@ const Chat = ({route, navigation}) => {
             }}>
             <Text style={styles.panelButtonText}>Call the person</Text>
           </TouchableOpacity>
+        </View>
+      </SwipeablePanel>
+      <SwipeablePanel
+        isActive={isTargetedPanelActive}
+        fullWidth="true"
+        openLarge="true"
+        onlyLarge="true"
+        showCloseButton="true"
+        onClose={() => closePanel()}
+        onPressCloseButton={() => closePanel()}
+        barStyle={{width: 100}}
+        style={styles.panel}>
+        <View style={styles.panelContainer}>
+          <Text style={styles.panelTitle}>A targeted alert was triggered</Text>
+          <Text style={styles.panelText}>
+            <Text style={{fontWeight: 'bold'}}>Field: </Text>
+            <Text>{targetedField}</Text>
+          </Text>
+          <Text style={[styles.panelText, {fontWeight: 'bold'}]}>
+            Description:
+          </Text>
+          <Text style={styles.panelText}>{targetedDescription}</Text>
+          <View style={{alignItems: 'center'}}>
+            <TouchableOpacity
+              style={styles.panelButton}
+              onPress={() => onChatChannel()}>
+              <Text style={styles.panelButtonText}>Chat with the person</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.panelButton}
+              onPress={() => {
+                Linking.openURL(`tel:${victimPhoneNumber}`);
+              }}>
+              <Text style={styles.panelButtonText}>Call the person</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </SwipeablePanel>
     </View>
